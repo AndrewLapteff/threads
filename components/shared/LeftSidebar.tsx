@@ -1,6 +1,5 @@
 'use client'
 import { sidebarLinks } from '@/constants'
-import { SignedIn, SignOutButton } from '@clerk/nextjs'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
@@ -33,21 +32,7 @@ const LeftSidebar = () => {
           )
         })}
       </div>
-      <div className="mt-10 px-10">
-        <SignedIn>
-          <SignOutButton signOutCallback={() => router.push('/sign-in')}>
-            <div className="flex cursor-pointer">
-              <Image
-                src="/assets/logout.svg"
-                alt="logout"
-                width={24}
-                height={24}
-              />
-              <p className="text-light-2 max-lg:hidden gap-6 p-4">Logout</p>
-            </div>
-          </SignOutButton>
-        </SignedIn>
-      </div>
+      <div className="mt-10 px-10"></div>
     </section>
   )
 }

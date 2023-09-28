@@ -1,5 +1,9 @@
-import { SignUp } from '@clerk/nextjs'
+import RegisterForm from '@/components/shared/RegisterForm'
 
 export default function Page() {
-  return <SignUp />
+  return (
+    <>
+      <RegisterForm />
+    </>
+  )
 }

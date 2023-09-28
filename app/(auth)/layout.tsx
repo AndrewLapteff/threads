@@ -1,4 +1,4 @@
-import { ClerkProvider } from '@clerk/nextjs'
+import '../globals.css'
 import { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 
@@ -9,16 +9,18 @@ export const metadata: Metadata = {
 
 const inter = Inter({ subsets: ['latin'] })
 
-export default function RootLayout({
+export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   return (
-    <ClerkProvider>
-      <html lang="en">
-        <body className={inter.className}>{children}</body>
-      </html>
-    </ClerkProvider>
+    <html lang="en">
+      <body
+        className={`${inter.className} relative bg-dark-1 flex flex-col justify-center min-h-screen overflow-hidden`}
+      >
+        {children}
+      </body>
+    </html>
   )
 }

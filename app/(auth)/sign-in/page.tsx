@@ -1,5 +1,9 @@
-import { SignIn } from '@clerk/nextjs'
+import LoginForm from '@/components/shared/LoginForm'
 
 export default function Page() {
-  return <SignIn />
+  return (
+    <>
+      <LoginForm />
+    </>
+  )
 }
