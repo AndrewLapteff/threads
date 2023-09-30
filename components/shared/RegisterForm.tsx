@@ -3,7 +3,10 @@
 import { useState } from 'react'
 import { FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
+<<<<<<< HEAD
 import Link from 'next/link'
+=======
+>>>>>>> 1ba57013fcdbbc377c219a568816a3b61f596156
 
 const RegisterForm = () => {
   const [username, setUsername] = useState('')

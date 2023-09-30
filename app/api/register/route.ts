@@ -2,10 +2,13 @@ import { connectMongoDb } from "@/lib/db"
 import User from "@/models/user"
 import { NextRequest, NextResponse } from "next/server"
 import { hash } from 'bcrypt'
+<<<<<<< HEAD
 import { sign } from "jsonwebtoken"
 import { serialize } from "cookie"
 
 const EXP = 30 * 24 * 60 * 60
+=======
+>>>>>>> 1ba57013fcdbbc377c219a568816a3b61f596156
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,6 +16,7 @@ export async function POST(req: NextRequest) {
 
     const hashedPassword = await hash(password, 10)
     await connectMongoDb()
+<<<<<<< HEAD
     const token = sign({ username, email, password }, process.env.JWT_SECRET as string, { expiresIn: EXP })
     const serialized = serialize('token', token, {
       httpOnly: true,
@@ -31,6 +35,10 @@ export async function POST(req: NextRequest) {
       sameSite: 'strict',
     })
     return response
+=======
+    await User.create({ username, email, password: hashedPassword })
+    return NextResponse.json({ message: 'User registered', status: 201 })
+>>>>>>> 1ba57013fcdbbc377c219a568816a3b61f596156
   } catch (error) {
     return NextResponse.json({ message: 'Error occured while registering user', status: 500 })
   }
