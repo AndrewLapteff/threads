@@ -1,10 +1,26 @@
 'use client'
 
+import { FormEvent, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 const LoginForm = () => {
+  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+
+  const router = useRouter()
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    try {
+    } catch (error) {}
+  }
+
   return (
     <div className="w-full p-6 m-auto bg-dark-2 rounded-md shadow-md lg:max-w-xl">
       <h1 className="font-semibold text-center text-white">Sign in</h1>
-      <form className="mt-6">
+      <form onSubmit={(e) => handleSubmit(e)} className="mt-6">
         <div className="mb-2">
           <label
             htmlFor="email"
@@ -13,6 +29,7 @@ const LoginForm = () => {
             Email
           </label>
           <input
+            onChange={(e) => setEmail(e.target.value)}
             type="email"
             className="block w-full px-4 py-2 mt-2 text-purple-700 bg-white border rounded-md focus:border-purple-400 focus:ring-purple-300 focus:outline-none focus:ring focus:ring-opacity-40"
           />
@@ -25,6 +42,7 @@ const LoginForm = () => {
             Password
           </label>
           <input
+            onChange={(e) => setPassword(e.target.value)}
             type="password"
             className="block w-full px-4 py-2 mt-2 text-purple-700 bg-white border rounded-md focus:border-purple-400 focus:ring-purple-300 focus:outline-none focus:ring focus:ring-opacity-40"
           />
@@ -71,9 +89,12 @@ const LoginForm = () => {
         </button>
       </div>
       <p className="mt-8 text-xs font-light text-center text-gray-700">
-        <a href="#" className="font-medium text-purple-600 hover:underline">
+        <Link
+          href="/sign-up"
+          className="font-medium text-purple-600 hover:underline"
+        >
           Sign up
-        </a>
+        </Link>
       </p>
     </div>
   )

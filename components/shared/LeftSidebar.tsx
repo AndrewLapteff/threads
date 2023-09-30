@@ -32,7 +32,12 @@ const LeftSidebar = () => {
           )
         })}
       </div>
-      <div className="mt-10 px-10"></div>
+      <div className="mt-10 px-6">
+        <button className="text-white leftsidebar_link">
+          <Image src="assets/logout.svg" width={24} height={24} alt="logout" />
+          Logout
+        </button>
+      </div>
     </section>
   )
 }
