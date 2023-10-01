@@ -1,26 +1,41 @@
 'use client'
 
-import { FormEvent, useState } from 'react'
+import { FormEvent, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useForm, SubmitHandler } from 'react-hook-form'
 import Link from 'next/link'
+import { FormSchema, formSchema } from '@/app/validation/loginSchema'
+import { zodResolver } from '@hookform/resolvers/zod'
+
 const LoginForm = () => {
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
 
+  const {
+    register,
+    handleSubmit,
+    watch,
+    reset,
+    setFocus,
+    formState: { isDirty, isSubmitting, errors },
+  } = useForm<FormSchema>({ resolver: zodResolver(formSchema) })
+
+  useEffect(() => {
+    setFocus('email')
+  }, [])
+
   const router = useRouter()
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    try {
-    } catch (error) {}
+  const handleSubmitt: SubmitHandler<FormSchema> = (data) => {
+    console.log(data)
   }
-
+  console.log(errors.confirmPassword)
   return (
     <div className="w-full p-6 m-auto bg-dark-2 rounded-md shadow-md lg:max-w-xl">
       <h1 className="font-semibold text-center text-white">Sign in</h1>
-      <form onSubmit={(e) => handleSubmit(e)} className="mt-6">
+      <form onSubmit={handleSubmit(handleSubmitt)} className="mt-6">
         <div className="mb-2">
           <label
             htmlFor="email"
@@ -29,10 +44,22 @@ const LoginForm = () => {
             Email
           </label>
           <input
+            {...register('email')}
+            id="email"
             onChange={(e) => setEmail(e.target.value)}
             type="email"
-            className="block w-full px-4 py-2 mt-2 text-purple-700 bg-white border rounded-md focus:border-purple-400 focus:ring-purple-300 focus:outline-none focus:ring focus:ring-opacity-40"
+            aria-invalid={errors.email ? 'true' : 'false'}
+            className={`block w-full px-4 py-2 mt-2 text-purple-700 bg-white ring rounded-md focus:border-purple-400 focus:ring-purple-300 ${
+              errors.email && 'ring-red-600'
+            } focus:outline-none focus:ring-opacity-40`}
           />
+          {errors.email ? (
+            <span role="alert" className="text-red-500">
+              {errors.email?.message}
+            </span>
+          ) : (
+            <div> </div>
+          )}
         </div>
         <div className="mb-2">
           <label
@@ -42,10 +69,47 @@ const LoginForm = () => {
             Password
           </label>
           <input
+            {...register('password')}
             onChange={(e) => setPassword(e.target.value)}
             type="password"
-            className="block w-full px-4 py-2 mt-2 text-purple-700 bg-white border rounded-md focus:border-purple-400 focus:ring-purple-300 focus:outline-none focus:ring focus:ring-opacity-40"
+            id="password"
+            aria-invalid={errors.password ? 'true' : 'false'}
+            className={`block w-full px-4 py-2 mt-2 text-purple-700 bg-white ring rounded-md focus:border-purple-400 focus:ring-purple-300 ${
+              errors.password && 'ring-red-600'
+            } focus:outline-none focus:ring-opacity-40`}
           />
+          {errors.password ? (
+            <span role="alert" className="text-red-500">
+              {errors.password?.message}
+            </span>
+          ) : (
+            <div> </div>
+          )}
+        </div>
+        <div className="mb-2">
+          <label
+            form="password"
+            className="block text-sm font-semibold text-white"
+          >
+            Confirm the password
+          </label>
+          <input
+            {...register('confirmPassword')}
+            onChange={(e) => setPassword(e.target.value)}
+            type="password"
+            id="confirmPassword"
+            aria-invalid={errors.confirmPassword ? 'true' : 'false'}
+            className={`block w-full px-4 py-2 mt-2 text-purple-700 bg-white ring rounded-md focus:border-purple-400 focus:ring-purple-300 ${
+              errors.confirmPassword && 'ring-red-600'
+            } focus:outline-none focus:ring-opacity-40`}
+          />
+          {errors.confirmPassword ? (
+            <span role="alert" className="text-red-500">
+              {errors.confirmPassword?.message}
+            </span>
+          ) : (
+            <div> </div>
+          )}
         </div>
         <a href="#" className="text-xs text-purple-600 hover:underline">
           Forget Password?
