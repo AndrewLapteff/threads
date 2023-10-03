@@ -1,9 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { RegisterSchema, registerSchema } from '@/app/validation/registerSchema'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { SubmitHandler, useForm } from 'react-hook-form'
 
 const RegisterForm = () => {
   const [username, setUsername] = useState('')
@@ -12,9 +15,19 @@ const RegisterForm = () => {
   const [error, setError] = useState('')
 
   const router = useRouter()
+  const {
+    register,
+    handleSubmit,
+    setFocus,
+    formState: { errors },
+  } = useForm<RegisterSchema>({ resolver: zodResolver(registerSchema) })
 
-  const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  useEffect(() => {
+    setFocus('email')
+  }, [])
+
+  const submitHandler: SubmitHandler<RegisterSchema> = async (userInfo) => {
+    const { username, email, password } = userInfo
     if (!username || !email || !password) {
       setError('All fields require')
       return
@@ -53,7 +66,7 @@ const RegisterForm = () => {
   return (
     <div className="w-full p-6 m-auto bg-dark-2 rounded-md shadow-md lg:max-w-xl">
       <h1 className="font-semibold text-center text-white">Sign up</h1>
-      <form onSubmit={(e) => submitHandler(e)} className="mt-6">
+      <form onSubmit={handleSubmit(submitHandler)} className="mt-6">
         <div className="mb-2">
           <label
             htmlFor="email"
@@ -62,11 +75,21 @@ const RegisterForm = () => {
             Username
           </label>
           <input
-            onChange={(e) => setUsername(e.target.value)}
-            value={username}
+            {...register('username')}
+            id="username"
             type="text"
-            className="block w-full px-4 py-2 mt-2 text-purple-700 bg-white border rounded-md focus:border-purple-400 focus:ring-purple-300 focus:outline-none focus:ring focus:ring-opacity-40"
+            aria-invalid={errors.email ? 'true' : 'false'}
+            className={`block w-full px-4 py-2 mt-2 text-purple-700 bg-white ring rounded-md focus:border-purple-400 focus:ring-purple-300 ${
+              errors.email && 'ring-red-600'
+            } focus:outline-none focus:ring-opacity-40`}
           />
+          {errors.username ? (
+            <span role="alert" className="text-red-500">
+              {errors.username?.message}
+            </span>
+          ) : (
+            <div> </div>
+          )}
         </div>
         <div className="mb-2">
           <label
@@ -76,11 +99,21 @@ const RegisterForm = () => {
             Email
           </label>
           <input
-            onChange={(e) => setEmail(e.target.value)}
-            value={email}
+            {...register('email')}
+            id="email"
             type="email"
-            className="block w-full px-4 py-2 mt-2 text-purple-700 bg-white border rounded-md focus:border-purple-400 focus:ring-purple-300 focus:outline-none focus:ring focus:ring-opacity-40"
+            aria-invalid={errors.email ? 'true' : 'false'}
+            className={`block w-full px-4 py-2 mt-2 text-purple-700 bg-white ring rounded-md focus:border-purple-400 focus:ring-purple-300 ${
+              errors.email && 'ring-red-600'
+            } focus:outline-none focus:ring-opacity-40`}
           />
+          {errors.email ? (
+            <span role="alert" className="text-red-500">
+              {errors.email?.message}
+            </span>
+          ) : (
+            <div> </div>
+          )}
         </div>
         <div className="mb-2">
           <label
@@ -90,11 +123,21 @@ const RegisterForm = () => {
             Password
           </label>
           <input
-            onChange={(e) => setPassword(e.target.value)}
-            value={password}
+            {...register('password')}
             type="password"
-            className="block w-full px-4 py-2 mt-2 text-purple-700 bg-white border rounded-md focus:border-purple-400 focus:ring-purple-300 focus:outline-none focus:ring focus:ring-opacity-40"
+            id="password"
+            aria-invalid={errors.password ? 'true' : 'false'}
+            className={`block w-full px-4 py-2 mt-2 text-purple-700 bg-white ring rounded-md focus:border-purple-400 focus:ring-purple-300 ${
+              errors.password && 'ring-red-600'
+            } focus:outline-none focus:ring-opacity-40`}
           />
+          {errors.password ? (
+            <span role="alert" className="text-red-500">
+              {errors.password?.message}
+            </span>
+          ) : (
+            <div> </div>
+          )}
         </div>
         <a href="#" className="text-xs text-purple-600 hover:underline">
           Forget Password?

@@ -1,26 +1,24 @@
 'use client'
 
-import { FormEvent, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm, SubmitHandler } from 'react-hook-form'
 import Link from 'next/link'
-import { FormSchema, formSchema } from '@/app/validation/loginSchema'
+import { LoginSchema, loginSchema } from '@/app/validation/loginSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
+import axios, { AxiosError } from 'axios'
+import { ApiResponse } from '@/app/types/ApiResponse'
+import { UserType } from '@/app/types/User'
 
 const LoginForm = () => {
-  const [username, setUsername] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [error, setError] = useState('')
 
   const {
     register,
     handleSubmit,
-    watch,
-    reset,
     setFocus,
-    formState: { isDirty, isSubmitting, errors },
-  } = useForm<FormSchema>({ resolver: zodResolver(formSchema) })
+    formState: { errors },
+  } = useForm<LoginSchema>({ resolver: zodResolver(loginSchema) })
 
   useEffect(() => {
     setFocus('email')
@@ -28,14 +26,23 @@ const LoginForm = () => {
 
   const router = useRouter()
 
-  const handleSubmitt: SubmitHandler<FormSchema> = (data) => {
-    console.log(data)
+  const submitHandler: SubmitHandler<LoginSchema> = async (userInfo) => {
+    setError('')
+    axios
+      .post<ApiResponse<UserType>>('/api/login', userInfo)
+      .then((res) => {
+        console.log(res.data.user)
+      })
+      .catch((error) => {
+        const err = error as AxiosError<ApiResponse<UserType>>
+        setError(err.response?.data.error as string)
+      })
   }
-  console.log(errors.confirmPassword)
+
   return (
     <div className="w-full p-6 m-auto bg-dark-2 rounded-md shadow-md lg:max-w-xl">
       <h1 className="font-semibold text-center text-white">Sign in</h1>
-      <form onSubmit={handleSubmit(handleSubmitt)} className="mt-6">
+      <form onSubmit={handleSubmit(submitHandler)} className="mt-6">
         <div className="mb-2">
           <label
             htmlFor="email"
@@ -46,7 +53,6 @@ const LoginForm = () => {
           <input
             {...register('email')}
             id="email"
-            onChange={(e) => setEmail(e.target.value)}
             type="email"
             aria-invalid={errors.email ? 'true' : 'false'}
             className={`block w-full px-4 py-2 mt-2 text-purple-700 bg-white ring rounded-md focus:border-purple-400 focus:ring-purple-300 ${
@@ -70,7 +76,6 @@ const LoginForm = () => {
           </label>
           <input
             {...register('password')}
-            onChange={(e) => setPassword(e.target.value)}
             type="password"
             id="password"
             aria-invalid={errors.password ? 'true' : 'false'}
@@ -95,7 +100,6 @@ const LoginForm = () => {
           </label>
           <input
             {...register('confirmPassword')}
-            onChange={(e) => setPassword(e.target.value)}
             type="password"
             id="confirmPassword"
             aria-invalid={errors.confirmPassword ? 'true' : 'false'}
@@ -115,11 +119,18 @@ const LoginForm = () => {
           Forget Password?
         </a>
         <div className="mt-6">
-          <button className="w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-purple-700 rounded-md hover:bg-purple-600 focus:outline-none focus:bg-purple-600">
+          <button className="w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-purple-700 rounded-md hover:bg-purple-600 focus:outline-none focus:bg-purple-600 mb-4">
             Login
           </button>
         </div>
       </form>
+      {error ? (
+        <p role="alert" className="text-red-500 text-center">
+          {error}
+        </p>
+      ) : (
+        <div> </div>
+      )}
       <div className="flex mt-4 gap-x-2">
         <button
           type="button"
