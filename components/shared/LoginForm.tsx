@@ -31,7 +31,7 @@ const LoginForm = () => {
     axios
       .post<ApiResponse<UserType>>('/api/login', userInfo)
       .then((res) => {
-        console.log(res.data.user)
+        router.push('/')
       })
       .catch((error) => {
         const err = error as AxiosError<ApiResponse<UserType>>

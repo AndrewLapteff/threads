@@ -4,8 +4,8 @@ import { NextRequest, NextResponse } from "next/server"
 import { hash } from 'bcrypt'
 import { sign } from "jsonwebtoken"
 import { serialize } from "cookie"
+import { EXP } from "@/app/constants"
 
-const EXP = 30 * 24 * 60 * 60
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     await connectMongoDb()
     await User.create({ username, email, password: hashedPassword })
     const response = NextResponse.json({ message: 'User registered', status: 201 })
-    const token = sign({ username, email, password }, process.env.JWT_SECRET as string, { expiresIn: EXP })
+    const token = sign({ username, email }, process.env.JWT_SECRET as string, { expiresIn: EXP })
     response.cookies.set('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
