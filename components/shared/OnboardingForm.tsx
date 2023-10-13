@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { ChangeEvent, ChangeEventHandler, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { loginSchema } from '@/app/validation/loginSchema'
@@ -38,6 +38,26 @@ const OnboardingForm = () => {
   function onSubmit(values: z.infer<typeof onboardingSchema>) {
     console.log(values)
   }
+  const [files, setFiles] = useState<File[]>([])
+
+  const fileHandler = (
+    e: ChangeEvent<HTMLInputElement>,
+    fieldChange: (value: string) => void
+  ) => {
+    const fileReader = new FileReader()
+
+    if (e.target.files && e.target.files?.length > 0) {
+      const file = e.target.files[0]
+
+      if (!file.type.includes('image')) return
+
+      fileReader.onload = async (event) => {
+        const dataUrl = event.target?.result?.toString() || ''
+        fieldChange(dataUrl)
+      }
+      fileReader.readAsDataURL(file)
+    }
+  }
 
   return (
     <Form {...form}>
@@ -56,9 +76,9 @@ const OnboardingForm = () => {
               >
                 {field.value ? (
                   <Image
-                    width={30}
-                    height={30}
-                    src="/assets/check.svg" // field.value
+                    width={70}
+                    height={70}
+                    src={field.value} // field.value
                     alt="profile picture"
                     className="rounded-full object-contain"
                   />
@@ -73,7 +93,11 @@ const OnboardingForm = () => {
                 )}
               </FormLabel>
               <FormControl>
-                <Input className="hidden" type="file" {...field} />
+                <Input
+                  className="hidden"
+                  type="file"
+                  onChange={(e) => fileHandler(e, field.onChange)}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
