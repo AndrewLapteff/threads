@@ -3,7 +3,6 @@
 import { ChangeEvent, ChangeEventHandler, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
-import { loginSchema } from '@/app/validation/loginSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Form,
@@ -23,6 +22,8 @@ import {
 } from '@/app/validation/onboardingSchema'
 import Image from 'next/image'
 import { Textarea } from '../ui/textarea'
+import axios from 'axios'
+import { isImageBase64 } from '@/lib/utils'
 
 const OnboardingForm = () => {
   const [error, setError] = useState('')
@@ -35,7 +36,17 @@ const OnboardingForm = () => {
   })
 
   const router = useRouter()
-  function onSubmit(values: z.infer<typeof onboardingSchema>) {
+  async function onSubmit(values: z.infer<typeof onboardingSchema>) {
+    if (!(values.bio || values.name || values.image)) return
+
+    if (!isImageBase64(values.image)) return
+
+    try {
+      const res = await axios.post('/api/onboarding', values)
+      res.data
+    } catch (error) {
+      console.log('err')
+    }
     console.log(values)
   }
   const [files, setFiles] = useState<File[]>([])
@@ -72,15 +83,19 @@ const OnboardingForm = () => {
             <FormItem className="mb-5">
               <FormLabel
                 className="account-form_image-label"
-                style={{ color: 'white', cursor: 'pointer' }}
+                style={{
+                  color: 'white',
+                  cursor: 'pointer',
+                  overflow: 'hidden',
+                }}
               >
                 {field.value ? (
                   <Image
-                    width={70}
-                    height={70}
-                    src={field.value} // field.value
+                    width={100}
+                    height={80}
+                    src={field.value}
                     alt="profile picture"
-                    className="rounded-full object-contain"
+                    className="rounded-full overflow-hidden object-contain"
                   />
                 ) : (
                   <Image
@@ -125,7 +140,7 @@ const OnboardingForm = () => {
               <FormControl>
                 <Textarea
                   className="resize-none"
-                  placeholder="John"
+                  placeholder="Bio"
                   {...field}
                 />
               </FormControl>

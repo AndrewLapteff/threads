@@ -1,5 +1,6 @@
 'use client'
 import { sidebarLinks } from '@/constants'
+import { signOut } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
@@ -33,7 +34,10 @@ const LeftSidebar = () => {
         })}
       </div>
       <div className="mt-10 px-6">
-        <button className="text-white leftsidebar_link">
+        <button
+          onClick={() => signOut()}
+          className="text-white leftsidebar_link"
+        >
           <Image src="assets/logout.svg" width={24} height={24} alt="logout" />
           Logout
         </button>

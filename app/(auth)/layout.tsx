@@ -1,7 +1,7 @@
+import Providers from '@/components/shared/Providers'
 import '../globals.css'
 import { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-
 export const metadata: Metadata = {
   title: 'Threads',
   description: 'An application for communication',

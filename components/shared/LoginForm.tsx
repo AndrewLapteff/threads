@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { redirect, useRouter } from 'next/navigation'
 import { useForm, SubmitHandler } from 'react-hook-form'
 import Link from 'next/link'
 import { LoginSchema, loginSchema } from '@/app/validation/loginSchema'
@@ -9,9 +9,14 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import axios, { AxiosError } from 'axios'
 import { ApiResponse } from '@/app/types/ApiResponse'
 import { UserType } from '@/app/types/User'
+import { SessionProvider, useSession } from 'next-auth/react'
 
-const LoginForm = () => {
+const LoginFormComponent = () => {
   const [error, setError] = useState('')
+  const { status } = useSession()
+  if (status === 'authenticated') {
+    redirect('/')
+  }
 
   const {
     register,
@@ -37,6 +42,10 @@ const LoginForm = () => {
         const err = error as AxiosError<ApiResponse<UserType>>
         setError(err.response?.data.error as string)
       })
+  }
+
+  if (status === 'loading') {
+    return <p className="text-white text-center">Loading</p>
   }
 
   return (
@@ -146,4 +155,10 @@ const LoginForm = () => {
   )
 }
 
-export default LoginForm
+export default function LoginForm() {
+  return (
+    <SessionProvider>
+      <LoginFormComponent />
+    </SessionProvider>
+  )
+}
