@@ -1,4 +1,5 @@
 'use client'
+
 import { sidebarLinks } from '@/constants'
 import { signOut } from 'next-auth/react'
 import Image from 'next/image'
@@ -8,6 +9,11 @@ import { usePathname, useRouter } from 'next/navigation'
 const LeftSidebar = () => {
   const pathname = usePathname()
   const router = useRouter()
+
+  const logoutHandler = () => {
+    signOut()
+  }
+
   return (
     <section className="custom-scrollbar leftsidebar">
       <div className="flex w-full flex-1 flex-col gap-6 px-6">
@@ -34,10 +40,7 @@ const LeftSidebar = () => {
         })}
       </div>
       <div className="mt-10 px-6">
-        <button
-          onClick={() => signOut()}
-          className="text-white leftsidebar_link"
-        >
+        <button onClick={logoutHandler} className="text-white leftsidebar_link">
           <Image src="assets/logout.svg" width={24} height={24} alt="logout" />
           Logout
         </button>

@@ -7,11 +7,7 @@ export function HomeComponent() {
   if (status === 'loading') {
     return <p className="text-white text-center">Loading</p>
   }
-  return (
-    <>
-      <h1 className="head-text text-left">Home</h1>
-    </>
-  )
+  return <h1 className="head-text text-left">Home</h1>
 }
 
 export default function Home() {
