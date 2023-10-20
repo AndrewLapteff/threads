@@ -1,14 +1,12 @@
 'use client'
 
-import { ChangeEvent, ChangeEventHandler, useState } from 'react'
+import { ChangeEvent, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
-import { loginSchema } from '@/app/validation/loginSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -23,22 +21,33 @@ import {
 } from '@/app/validation/onboardingSchema'
 import Image from 'next/image'
 import { Textarea } from '../ui/textarea'
+import axios from 'axios'
+import { isImageBase64 } from '@/lib/utils'
+import { SessionProvider, useSession } from 'next-auth/react'
 
-const OnboardingForm = () => {
+const OnboardingFormComponent = () => {
+  const { data } = useSession()
+
   const [error, setError] = useState('')
 
   const form = useForm<OnboardingSchema>({
     resolver: zodResolver(onboardingSchema),
-    defaultValues: {
-      name: '',
-    },
   })
 
   const router = useRouter()
-  function onSubmit(values: z.infer<typeof onboardingSchema>) {
+  async function onSubmit(values: z.infer<typeof onboardingSchema>) {
+    if (!(values.bio || values.name || values.image)) return
+
+    if (!isImageBase64(values.image)) return
+
+    try {
+      const res = await axios.post('/api/onboarding', values)
+      res.data
+    } catch (error) {
+      console.log('err')
+    }
     console.log(values)
   }
-  const [files, setFiles] = useState<File[]>([])
 
   const fileHandler = (
     e: ChangeEvent<HTMLInputElement>,
@@ -68,53 +77,65 @@ const OnboardingForm = () => {
         <FormField
           control={form.control}
           name="image"
-          render={({ field }) => (
-            <FormItem className="mb-5">
-              <FormLabel
-                className="account-form_image-label"
-                style={{ color: 'white', cursor: 'pointer' }}
-              >
-                {field.value ? (
-                  <Image
-                    width={70}
-                    height={70}
-                    src={field.value} // field.value
-                    alt="profile picture"
-                    className="rounded-full object-contain"
+          render={({ field }) => {
+            if (field.value === undefined)
+              field.value = data?.user?.image === null ? '' : data?.user?.image
+            return (
+              <FormItem className="mb-5">
+                <FormLabel
+                  className="account-form_image-label"
+                  style={{
+                    color: 'white',
+                    cursor: 'pointer',
+                    overflow: 'hidden',
+                  }}
+                >
+                  {field.value ? (
+                    <Image
+                      width={100}
+                      height={80}
+                      src={field.value}
+                      alt="profile picture"
+                      className="rounded-full overflow-hidden object-contain"
+                    />
+                  ) : (
+                    <Image
+                      width={24}
+                      height={24}
+                      src="/assets/profile.svg"
+                      alt="profile picture"
+                      className="rounded-full object-contain"
+                    />
+                  )}
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    className="hidden"
+                    type="file"
+                    onChange={(e) => fileHandler(e, field.onChange)}
                   />
-                ) : (
-                  <Image
-                    width={24}
-                    height={24}
-                    src="/assets/profile.svg"
-                    alt="profile picture"
-                    className="rounded-full object-contain"
-                  />
-                )}
-              </FormLabel>
-              <FormControl>
-                <Input
-                  className="hidden"
-                  type="file"
-                  onChange={(e) => fileHandler(e, field.onChange)}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )
+          }}
         />
         <FormField
           control={form.control}
           name="name"
-          render={({ field }) => (
-            <FormItem className="mb-5">
-              <FormLabel style={{ color: 'white' }}>Name</FormLabel>
-              <FormControl>
-                <Input placeholder="John" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          render={({ field }) => {
+            if (field.value === undefined)
+              field.value = data?.user?.name === null ? '' : data?.user?.name
+            return (
+              <FormItem className="mb-5">
+                <FormLabel style={{ color: 'white' }}>Name</FormLabel>
+                <FormControl>
+                  <Input placeholder="John" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )
+          }}
         />
         <FormField
           control={form.control}
@@ -125,7 +146,7 @@ const OnboardingForm = () => {
               <FormControl>
                 <Textarea
                   className="resize-none"
-                  placeholder="John"
+                  placeholder="Bio"
                   {...field}
                 />
               </FormControl>
@@ -138,6 +159,14 @@ const OnboardingForm = () => {
         </Button>
       </form>
     </Form>
+  )
+}
+
+const OnboardingForm = () => {
+  return (
+    <SessionProvider>
+      <OnboardingFormComponent />
+    </SessionProvider>
   )
 }
 
