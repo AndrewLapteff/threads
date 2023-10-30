@@ -1,7 +1,7 @@
 'use client'
 
 import { ChangeEvent, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
@@ -18,35 +18,62 @@ import * as z from 'zod'
 import {
   OnboardingSchema,
   onboardingSchema,
-} from '@/app/validation/onboardingSchema'
+} from '@/lib/validation/onboardingSchema'
 import Image from 'next/image'
 import { Textarea } from '../ui/textarea'
-import axios from 'axios'
-import { isImageBase64 } from '@/lib/utils'
-import { SessionProvider, useSession } from 'next-auth/react'
+import { calculateImageSize, isImageBase64 } from '@/lib/utils'
+import { updateUser } from '@/lib/actions/user.actions'
+import { useUser } from '@clerk/nextjs'
+import { MAX_FILE_SIZE } from '@/constants'
+import { useUploadThing } from '@/lib/uploadthing'
 
-const OnboardingFormComponent = () => {
-  const { data } = useSession()
-
-  const [error, setError] = useState('')
+const OnboardingForm = () => {
+  const { user } = useUser()
+  const pathname = usePathname()
+  const router = useRouter()
+  const [files, setFile] = useState<File[]>([])
+  const [imgError, setImgError] = useState('')
 
   const form = useForm<OnboardingSchema>({
     resolver: zodResolver(onboardingSchema),
   })
 
-  const router = useRouter()
+  const { startUpload } = useUploadThing('media')
+
   async function onSubmit(values: z.infer<typeof onboardingSchema>) {
     if (!(values.bio || values.name || values.image)) return
+    const isImage = isImageBase64(values.image)
+    let isTheSizeRight
+    if (isImage)
+      isTheSizeRight = calculateImageSize(values.image) < MAX_FILE_SIZE
 
-    if (!isImageBase64(values.image)) return
+    if (!user) return
+
+    if (isImage) {
+      if (isTheSizeRight) {
+        const imgRes = await startUpload(files)
+        if (imgRes && imgRes[0].url) values.image = imgRes[0].url
+      } else {
+        setImgError('The size of image is too heavy')
+      }
+    } else {
+      setImgError('This format of image is not allowed')
+    }
 
     try {
-      const res = await axios.post('/api/onboarding', values)
-      res.data
+      updateUser({
+        bio: values.bio ? values.bio : null,
+        name: values.name ? values.name : null,
+        image: values.image,
+        userId: user.id,
+        username: user.fullName as string,
+        path: pathname,
+      })
+
+      router.push('/')
     } catch (error) {
-      console.log('err')
+      console.log(error)
     }
-    console.log(values)
   }
 
   const fileHandler = (
@@ -57,6 +84,8 @@ const OnboardingFormComponent = () => {
 
     if (e.target.files && e.target.files?.length > 0) {
       const file = e.target.files[0]
+
+      setFile(Array.from(e.target.files))
 
       if (!file.type.includes('image')) return
 
@@ -79,7 +108,7 @@ const OnboardingFormComponent = () => {
           name="image"
           render={({ field }) => {
             if (field.value === undefined)
-              field.value = data?.user?.image === null ? '' : data?.user?.image
+              field.value = user?.imageUrl === null ? '' : user?.imageUrl
             return (
               <FormItem className="mb-5">
                 <FormLabel
@@ -125,7 +154,7 @@ const OnboardingFormComponent = () => {
           name="name"
           render={({ field }) => {
             if (field.value === undefined)
-              field.value = data?.user?.name === null ? '' : data?.user?.name
+              field.value = user?.fullName === null ? '' : user?.fullName!
             return (
               <FormItem className="mb-5">
                 <FormLabel style={{ color: 'white' }}>Name</FormLabel>
@@ -159,14 +188,6 @@ const OnboardingFormComponent = () => {
         </Button>
       </form>
     </Form>
-  )
-}
-
-const OnboardingForm = () => {
-  return (
-    <SessionProvider>
-      <OnboardingFormComponent />
-    </SessionProvider>
   )
 }
 

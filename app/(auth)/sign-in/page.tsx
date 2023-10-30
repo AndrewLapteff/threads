@@ -1,9 +1,9 @@
-import LoginFormComponent from '@/components/shared/LoginForm'
+import { SignIn, SignUp } from '@clerk/nextjs'
 
 export default function Page() {
   return (
     <>
-      <LoginFormComponent />
+      <SignUp />
     </>
   )
 }

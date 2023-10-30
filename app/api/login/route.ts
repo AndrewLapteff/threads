@@ -1,4 +1,4 @@
-import { connectMongoDb } from "@/lib/db"
+import { connectToDb } from "@/lib/db"
 import User from "@/models/user"
 import { NextRequest, NextResponse } from "next/server"
 import { compare } from 'bcrypt'
@@ -8,7 +8,7 @@ import { EXP } from "@/app/constants"
 export async function POST(req: NextRequest) {
   try {
     const { email, password } = await req.json()
-    await connectMongoDb()
+    await connectToDb()
     const user = await User.findOne({ email })
     const isCorrect = await compare(password, user.password)
 

@@ -1,4 +1,4 @@
-import Providers from '@/components/shared/Providers'
+import { ClerkProvider } from '@clerk/nextjs'
 import '../globals.css'
 import { Metadata } from 'next'
 import { Inter } from 'next/font/google'
@@ -16,11 +16,13 @@ export default function AuthLayout({
 }) {
   return (
     <html lang="en">
-      <body
-        className={`${inter.className} relative bg-dark-1 flex flex-col justify-center min-h-screen overflow-hidden`}
-      >
-        {children}
-      </body>
+      <ClerkProvider>
+        <body
+          className={`${inter.className} relative bg-dark-1 flex flex-col justify-center min-h-screen overflow-hidden`}
+        >
+          {children}
+        </body>
+      </ClerkProvider>
     </html>
   )
 }

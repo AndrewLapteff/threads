@@ -19,3 +19,16 @@ export function formatDateString(dateString: string) {
 
   const date = new Date()
 }
+
+export function calculateImageSize(base64String: string) {
+  // Remove data URI prefix if present
+  if (base64String.startsWith('data:')) {
+    base64String = base64String.split(',')[ 1 ]
+  }
+  // Decode the base64 string into binary data
+  const binaryData = atob(base64String)
+  // Calculate the length of the binary data (size in bytes)
+  const imageSizeInBytes = binaryData.length
+
+  return imageSizeInBytes
+}

@@ -5,10 +5,7 @@ import Header from '@/components/shared/Header'
 import LeftSidebar from '@/components/shared/LeftSidebar'
 import RightSidebar from '@/components/shared/RightSidebar'
 import Footer from '@/components/shared/Footer'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
-import { SessionProvider } from 'next-auth/react'
-
+import { ClerkProvider } from '@clerk/nextjs'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
@@ -20,15 +17,17 @@ async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Header />
-        <main className="flex flex-row">
-          <LeftSidebar />
-          <section className="main-container">
-            <div className="w-full max-w-4xl">{children}</div>
-          </section>
-          <RightSidebar />
-        </main>
-        <Footer />
+        <ClerkProvider>
+          <Header />
+          <main className="flex flex-row">
+            <LeftSidebar />
+            <section className="main-container">
+              <div className="w-full max-w-4xl">{children}</div>
+            </section>
+            <RightSidebar />
+          </main>
+          <Footer />
+        </ClerkProvider>
       </body>
     </html>
   )

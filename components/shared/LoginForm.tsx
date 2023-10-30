@@ -4,19 +4,15 @@ import { useEffect, useState } from 'react'
 import { redirect, useRouter } from 'next/navigation'
 import { useForm, SubmitHandler } from 'react-hook-form'
 import Link from 'next/link'
-import { LoginSchema, loginSchema } from '@/app/validation/loginSchema'
+import { LoginSchema, loginSchema } from '@/lib/validation/loginSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import axios, { AxiosError } from 'axios'
 import { ApiResponse } from '@/app/types/ApiResponse'
 import { UserType } from '@/app/types/User'
-import { SessionProvider, signIn, useSession } from 'next-auth/react'
+import { SignIn } from '@clerk/nextjs'
 
-const LoginFormComponent = () => {
+const LoginFormAbandoned = () => {
   const [error, setError] = useState('')
-  const { status } = useSession()
-  if (status === 'authenticated') {
-    redirect('/')
-  }
 
   const {
     register,
@@ -42,14 +38,6 @@ const LoginFormComponent = () => {
         const err = error as AxiosError<ApiResponse<UserType>>
         setError(err.response?.data.error as string)
       })
-  }
-
-  const googleAuth = () => {
-    signIn('google', { callbackUrl: 'http://localhost:3000/' })
-  }
-
-  if (status === 'loading') {
-    return <p className="text-white text-center">Loading</p>
   }
 
   return (
@@ -142,7 +130,6 @@ const LoginFormComponent = () => {
       </form>
       <div className="flex mt-4 gap-x-2">
         <button
-          onClick={googleAuth}
           type="button"
           className="flex items-center justify-center w-full p-2 border border-gray-600 rounded-md focus:ring-2 focus:ring-offset-1 focus:ring-violet-600"
         >
@@ -180,13 +167,5 @@ const LoginFormComponent = () => {
         </Link>
       </p>
     </div>
-  )
-}
-
-export default function LoginForm() {
-  return (
-    <SessionProvider>
-      <LoginFormComponent />
-    </SessionProvider>
   )
 }

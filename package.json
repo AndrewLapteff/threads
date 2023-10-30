@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@clerk/nextjs": "^4.26.1",
     "@hookform/resolvers": "^3.3.1",
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-slot": "^1.0.2",
@@ -31,7 +32,6 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^7.5.2",
     "next": "^13.5.4",
-    "next-auth": "^4.23.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.47.0",
