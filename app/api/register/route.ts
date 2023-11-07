@@ -1,5 +1,5 @@
 import { connectToDb } from "@/lib/db"
-import User from "@/models/user"
+import User from "@/models/user.model"
 import { NextRequest, NextResponse } from "next/server"
 import { hash } from 'bcrypt'
 import { sign } from "jsonwebtoken"

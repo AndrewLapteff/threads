@@ -1,6 +1,6 @@
 "use server"
 
-import User from "@/models/user"
+import User from "@/models/user.model"
 import { connectToDb } from "../db"
 import { revalidatePath } from "next/cache"
 
@@ -43,5 +43,17 @@ export async function updateUser(
 
   } catch (error: any) {
     throw new Error(`Faild to create/update user: ${error.message}`)
+  }
+}
+
+export async function fetchUser(userId: string) {
+  try {
+    connectToDb()
+
+    return await User
+      .findOne({ id: userId })
+    // .populate({ path: 'communities', model: Community })
+  } catch (error: any) {
+    throw new Error(`Error occured while fetching user: ${error.message!}`)
   }
 }

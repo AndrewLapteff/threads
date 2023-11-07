@@ -3,6 +3,7 @@
 import { UserButton, UserProfile } from '@clerk/nextjs'
 import Image from 'next/image'
 import Link from 'next/link'
+import { dark } from '@clerk/themes'
 
 const Header = () => {
   return (
@@ -12,8 +13,15 @@ const Header = () => {
         <p className="text-light-1 text-heading3-bold max-xs:hidden">Threads</p>
       </Link>
       <div className="flex items-center gap-1">
-        <UserProfile path="/user-profile" routing="path" />
-        <UserButton afterSignOutUrl="/sign-in" />
+        <UserProfile
+          appearance={{ baseTheme: dark }}
+          path="/user-profile"
+          routing="path"
+        />
+        <UserButton
+          appearance={{ baseTheme: dark }}
+          afterSignOutUrl="/sign-in"
+        />
         <div className="block md:hidden">
           <button className="flex items-center justify-center">
             <Image

@@ -5,7 +5,8 @@ import Header from '@/components/shared/Header'
 import LeftSidebar from '@/components/shared/LeftSidebar'
 import RightSidebar from '@/components/shared/RightSidebar'
 import Footer from '@/components/shared/Footer'
-import { ClerkProvider } from '@clerk/nextjs'
+import { ClerkProvider, currentUser } from '@clerk/nextjs'
+import { redirect } from 'next/navigation'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
@@ -14,6 +15,9 @@ export const metadata: Metadata = {
 }
 
 async function RootLayout({ children }: { children: React.ReactNode }) {
+  const user = await currentUser()
+  if (!user) return redirect('/sing-in')
+
   return (
     <html lang="en">
       <body className={inter.className}>
